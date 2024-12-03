@@ -98,7 +98,7 @@ void loop()
   delay(DELAY_ORANGE); // 20 sec 
 
   // GREEN Signal
-  sendVal = 2;    
+  sendVal = 3;    
   tr_light="GREEN";                                   
   espData("AT+CIPMUX=1", 1000, DEBUG);              
   espData("AT+CIPSTART=0,\"TCP\",\""+ myHOST +"\","+ myPORT, 1000, DEBUG);
@@ -116,21 +116,6 @@ void loop()
 
 
   Serial.println("======== [Task B.1] ========");
-
-  while(1)
-  {
-    if (Serial.available() > 0) 
-    { // Checks whether data is comming from the serial port
-      path[i] = Serial.read(); // Reads the data from the serial port
-      Serial.print(path[i]);
-      Serial.print('\t');
-    }
-    
-    if (path[i] == 'e')
-    {
-      Serial.print("loop exit");
-      break;
-    }
 
   // zitoumeno b.2
   sendVal = 3;                            
