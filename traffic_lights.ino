@@ -5,6 +5,7 @@ SoftwareSerial espSerial(6, 7);   // Connect (Arduino RX: pin 6) to (ESP-01: TX 
 String mySSID = "linksys_1";            // WiFi SSID
 String myPWD = "";                	    // WiFi Password
 String myWriteAPI = "6UKE7N1W16R0TIOC"; // Write API Key
+//String otherUserAPI = "";
 
 String myReadAPI = "MCX66QIC4S1OR75T";  // Read API Key
 String myHOST = "api.thingspeak.com";   // ThingSpeak Host
@@ -17,6 +18,7 @@ String fieldRed = "field1";             // Field for RED signal
 String fieldOrange = "field2";          // Field for ORANGE signal
 String fieldGreen = "field3";           // Field for GREEN signal
 String alertField = "field8";           // Field for ALERT signal
+//String otherUserAlertField = ""; 
 
 int DELAY_RED = 30000;                  // Delay for RED signal
 int DELAY_ORANGE = 20000;               // Delay for ORANGE signal
@@ -114,20 +116,47 @@ void loop()
 
   Serial.println("============================"); 
 
-
+/*
   Serial.println("======== [Task B.1] ========");
-
-  // zitoumeno b.2
-  sendVal = 3;                            
-  sendData = "GET /update?api_key="+ myAPI +"&"+ alertField +"="+String(sendVal);
-  espData("AT+CIPMUX=1", 1000, DEBUG);               // Allow multiple connections
-  espData("AT+CIPSTART=0,\"TCP\",\""+ myHOST +"\","+ myPORT, 1000, DEBUG);
-  espData("AT+CIPSEND=0," +String(sendData.length()+4),1000,DEBUG);  
+  sendVal = 0;
+  tr_light = "ALERT";                            
+  sendData = "GET /update?api_key="+ otherUserAPI + "&" + otherUserAlertField + "=" + String(sendVal);
+  espData("AT+CIPMUX=1", 1000, DEBUG);            
+  espData("AT+CIPSTART=0,\"TCP\",\""+ myHOST + "\"," + myPORT, 1000, DEBUG);
+  espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);  
   espSerial.find(">");
   espSerial.println(sendData);
   Serial.print("Value to be sent: ");
   Serial.println(sendVal);
 
+  espData("AT+CIPCLOSE=0", 10000, DEBUG);
+  Serial.println(tr_light);
+
+  Serial.println("============================"); 
+*/
+
+  Serial.println("======== [Task B.2] ========");
+  sendVal = 0;
+  tr_light = "ALERT";                            
+  sendData = "GET /update?api_key="+ myWriteAPI + "&" + alertField + "=" + String(sendVal);
+  espData("AT+CIPMUX=1", 1000, DEBUG);            
+  espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
+  espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);  
+  espSerial.find(">");
+  espSerial.println(sendData);
+  Serial.print("Value to be sent: ");
+  Serial.println(sendVal);
+
+  espData("AT+CIPCLOSE=0", 10000, DEBUG);
+  Serial.println(tr_light);
+
+  Serial.println("============================");
+
+
+  Serial.println("======== [Task C.1] ========");
+  Serial.println("============================");
+  Serial.println("======== [Task C.2] ========");
+  Serial.println("============================");
   // zitoumeno g
 
   // after ten minutes field 8 take the value 4
