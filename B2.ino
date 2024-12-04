@@ -1,167 +1,137 @@
 #include <SoftwareSerial.h>       // Serial library
 SoftwareSerial espSerial(6, 7);   // Connect (Arduino RX: pin 6) to (ESP-01: TX pin)
-                                  // and (Arduino TX: pin 7) to (ESP-01: RX pin)
-#define DEBUG true
-String mySSID = "linksys_1";            // WiFi SSID
-String myPWD = "";                	    // WiFi Password
-String myHOST = "api.thingspeak.com";   // ThingSpeak Host
-String myPORT = "80";                   // ThingSpeak Port
-String myCHANNEL = "2749755";           // Channel ID
-String myWriteAPI = "6UKE7N1W16R0TIOC"; // Write API Key
-//String otherUserWriteAPI = "";
 
-String fieldRed = "field1";             // Field for RED signal
-String fieldOrange = "field2";          // Field for ORANGE signal
-String fieldGreen = "field3";           // Field for GREEN signal
-String alertField = "field8";           // Field for ALERT signal
-//String otherUserAlertField = "";
+// WiFi and ThingSpeak Configuration
+String mySSID = "linksys_1";
+String myPWD = "";
+String myHOST = "api.thingspeak.com";
+String myPORT = "80";
+String myWriteAPI = "6UKE7N1W16R0TIOC";
+String otherChannelWriteAPI = "";
+String myCHANNEL = "2749755";
 
-int DELAY_RED = 30000;                  // Delay for RED signal
-int DELAY_ORANGE = 20000;               // Delay for ORANGE signal
-int DELAY_GREEN = 30000;                // Delay for GREEN signal
-String tr_light = "";                   // Traffic light status
+// Field Names
+String fieldRed = "field1";
+String fieldOrange = "field2";
+String fieldGreen = "field3";
+String alertField = "field8";
 
-int sendVal;                            // Value to be sent
-String sendData = "";                   // Data to be sent
+// Traffic Light Durations
+int DELAY_RED = 30000;      // Delay for RED signal
+int DELAY_ORANGE = 20000;   // Delay for ORANGE signal
+int DELAY_GREEN = 30000;    // Delay for GREEN signal
 
-void setup()
+void setup() 
 {
     Serial.begin(9600);
-    espSerial.begin(9600);                                               // IN CASE OF ERROR, change espSerial to 9600
- 
+    espSerial.begin(9600);
+
     Serial.println("======== [ESP8266 Setup] ========");
-    espData("AT+RST", 1000, DEBUG);                                      // ESP-01 Reset
-    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
-    espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Connect to WiFi network
     
-    while(!espSerial.find("WIFI GOT IP"))                                // Wait for connection
-    {          
-        Serial.print(".");
-        delay(1000);
-        Serial.print(".");
-        delay(1000);
+    espData("AT+RST", 1000, true);                                      // Reset ESP-01
+    espData("AT+CWMODE=1", 1000, true);                                 // Set mode to client
+    espData("AT+CWJAP=\"" + mySSID + "\",\"" + myPWD + "\"", 1000, true); // Connect to WiFi
+
+    while (!espSerial.find("WIFI GOT IP"))  // Wait for connection
+    {                            
         Serial.print(".");
         delay(1000);
     }
- 
-    Serial.println("Connected!");
-    Serial.println("=================================");
-    delay(1000);
-}
-
-void loop() 
-{
-    Serial.println("======== [Task A.4] ========");
+    Serial.println("\nConnected!");
     
-    // RED Signal
-    sendVal = 1;
-    tr_light="RED";                         
-    sendData = "GET /update?api_key=" + myWriteAPI + "&" + fieldRed + "=" + String(sendVal);
-    espData("AT+CIPMUX=1", 1000, DEBUG);   
-    espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
-    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);  
-    espSerial.find(">");
-    espSerial.println(sendData);
-    Serial.print("Value to be sent: ");
-    Serial.println(sendVal);
-        
-    espData("AT+CIPCLOSE=0",10000,DEBUG);
-    Serial.println(tr_light);
-    delay(DELAY_RED); // 30 sec
+    Serial.println("=================================");
+}
 
-    // ORANGE Signal
-    sendVal = 2;
-    tr_light="ORANGE";    						         
-    sendData = "GET /update?api_key="+ myWriteAPI + "&" + fieldOrange + "=" + String(sendVal);
-    espData("AT+CIPMUX=1", 1000, DEBUG);     
-    espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
-    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG); 
-    espSerial.find(">");
-    espSerial.println(sendData);
-    Serial.print("Value to be sent: ");
-    Serial.println(sendVal);
-        
-    espData("AT+CIPCLOSE=0",10000,DEBUG);
-    Serial.println(tr_light);
-    delay(DELAY_ORANGE); // 20 sec 
+void loop() {
+    Serial.println("======== [Task A.4] ========");
 
-    // GREEN Signal
-    sendVal = 3;    
-    tr_light="GREEN";                                   
-    espData("AT+CIPMUX=1", 1000, DEBUG);              
-    espData("AT+CIPSTART=0,\"TCP\",\""+ myHOST +"\","+ myPORT, 1000, DEBUG);
-    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);  
-    espSerial.find(">");
-    espSerial.println(sendData);
-    Serial.print("Value to be sent: ");
-    Serial.println(sendVal);
-        
-    espData("AT+CIPCLOSE=0",10000,DEBUG);
-    Serial.println(tr_light);
-    delay(DELAY_GREEN); // 30 sec
+    // Set RED signal
+    setTrafficLight("RED");
+    delay(DELAY_RED);
+
+    // Set ORANGE signal
+    setTrafficLight("ORANGE");
+    delay(DELAY_ORANGE);
+
+    // Set GREEN signal
+    setTrafficLight("GREEN");
+    delay(DELAY_GREEN);
 
     Serial.println("============================");
 
-  /*
+    // Additional Task: Set Field 8 of another channel to 0
     Serial.println("======== [Task B.1] ========");
+    
+    setFieldValue(alertField, otherChannelWriteAPI, 0);
+    Serial.println("Field 8 of other channel set to 0.");
+    
+    Serial.println("============================");
 
-    sendVal = 0;
-    tr_light = "ALERT";                            
-    sendData = "GET /update?api_key="+ otherUserWriteAPI + "&" + otherUserAlertField + "=" + String(sendVal);
-    espData("AT+CIPMUX=1", 1000, DEBUG);            
-    espData("AT+CIPSTART=0,\"TCP\",\""+ myHOST + "\"," + myPORT, 1000, DEBUG);
-    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);  
-    espSerial.find(">");
-    espSerial.println(sendData);
-    Serial.print("Value to be sent: ");
-    Serial.println(sendVal);
-
-    espData("AT+CIPCLOSE=0", 10000, DEBUG);
-    Serial.println(tr_light);
-
-    Serial.println("============================"); 
-*/
-
+    // Additional Task: Set Field 8 of my channel to 0
     Serial.println("======== [Task B.2] ========");
-
-    sendVal = 0;
-    tr_light = "ALERT";                            
-    sendData = "GET /update?api_key="+ myWriteAPI + "&" + alertField + "=" + String(sendVal);
-    espData("AT+CIPMUX=1", 1000, DEBUG);            
-    espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
-    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);  
-    espSerial.find(">");
-    espSerial.println(sendData);
-    Serial.print("Value to be sent: ");
-    Serial.println(sendVal);
-
-    espData("AT+CIPCLOSE=0", 10000, DEBUG);
-    Serial.println(tr_light);
-
+    
+    setFieldValue(alertField, myWriteAPI, 0);
+    Serial.println("Field 8 of my channel set to 0.");
+    
     Serial.println("============================");
 }
 
-String espData(String command, const int timeout, boolean debug)
+// Function to set the traffic light to a specific color
+void setTrafficLight(String color) 
+{
+    String field;
+    int sendVal;
+    if (color == "RED") 
+    {
+        field = fieldRed;
+        sendVal = 1;
+    }
+    else if (color == "ORANGE") 
+    {
+        field = fieldOrange;
+        sendVal = 2;
+    }
+    else if (color == "GREEN")
+    {
+        field = fieldGreen;
+        sendVal = 3;
+    }
+    else return;
+
+    Serial.println("Traffic Light: " + color.toUpperCase());
+    setFieldValue(field, myWriteAPI, sendVal); // Update the appropriate field in ThingSpeak
+}
+
+// Function to set a field value on ThingSpeak
+void setFieldValue(String field, String writeAPI, int value) 
+{
+    String sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
+    espData("AT+CIPMUX=1", 1000, true);
+    espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, true);
+    espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, true);
+    espSerial.find(">");
+    espSerial.println(sendData);
+    espData("AT+CIPCLOSE=0", 1000, true);
+}
+
+// Function to send AT commands to ESP-01
+String espData(String command, const int timeout, boolean debug) 
 {
     Serial.print("AT Command ==> ");
-    Serial.print(command);
-    Serial.println("     ");
- 
+    Serial.println(command);
+
     String response = "";
     espSerial.println(command);
     long int time = millis();
-    while((time + timeout) > millis())
-    {
-        while(espSerial.available())
-        {
+    while ((time + timeout) > millis()) {
+        while (espSerial.available()) {
             char c = espSerial.read();
             response += c;
         }
     }
-    if (debug)
-    {
+    if (debug) {
         Serial.print(response);
     }
-    
+
     return response;
 }
