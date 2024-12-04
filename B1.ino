@@ -7,6 +7,7 @@ String myPWD = "";
 String myHOST = "api.thingspeak.com";
 String myPORT = "80";
 String myWriteAPI = "6UKE7N1W16R0TIOC";
+String otherChannelWriteAPI = "";
 String myCHANNEL = "2749755";
 
 // Field Names
@@ -56,6 +57,14 @@ void loop() {
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
 
+    Serial.println("============================");
+
+    // Additional Task: Set Field 8 of another channel to 0
+    Serial.println("======== [Task B.1] ========");
+    
+    setFieldValue(alertField, otherChannelWriteAPI, 0);
+    Serial.println("Field 8 of other channel set to 0.");
+    
     Serial.println("============================");
 }
 
