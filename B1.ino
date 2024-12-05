@@ -14,12 +14,16 @@ String myCHANNEL = "2749755";
 String fieldRed = "field1";
 String fieldOrange = "field2";
 String fieldGreen = "field3";
-String alertField = "field8";
+String otherAlertField = "";
 
 // Traffic Light Durations
 int DELAY_RED = 30000;      // Delay for RED signal
 int DELAY_ORANGE = 20000;   // Delay for ORANGE signal
 int DELAY_GREEN = 30000;    // Delay for GREEN signal
+
+String response;            // Response from ESP8266
+String sendData = "";       // Data to be sent
+int sendVal;                // Value to be sent
 
 void setup() 
 {
@@ -28,8 +32,8 @@ void setup()
 
     Serial.println("======== [ESP8266 Setup] ========");
     
-    espData("AT+RST", 1000, true);                                      // Reset ESP-01
-    espData("AT+CWMODE=1", 1000, true);                                 // Set mode to client
+    espData("AT+RST", 1000, true);                                        // Reset ESP-01
+    espData("AT+CWMODE=1", 1000, true);                                   // Set mode to client
     espData("AT+CWJAP=\"" + mySSID + "\",\"" + myPWD + "\"", 1000, true); // Connect to WiFi
 
     while (!espSerial.find("WIFI GOT IP"))  // Wait for connection
@@ -42,28 +46,31 @@ void setup()
     Serial.println("=================================");
 }
 
-void loop() {
+void loop() 
+{
+/*
+ *  [Task A.4] ==> Set the Traffic Light on operation 
+ */
     Serial.println("======== [Task A.4] ========");
 
-    // Set RED signal
     setTrafficLight("RED");
     delay(DELAY_RED);
 
-    // Set ORANGE signal
     setTrafficLight("ORANGE");
     delay(DELAY_ORANGE);
 
-    // Set GREEN signal
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
 
     Serial.println("============================");
 
-    // Additional Task: Set Field 8 of another channel to 0
+/*
+ *  [Task B.1] ==> Set ALERT Field (Field 8) of other channel to 0 
+ */
     Serial.println("======== [Task B.1] ========");
     
-    setFieldValue(alertField, otherChannelWriteAPI, 0);
-    Serial.println("Field 8 of other channel set to 0.");
+    setFieldValue(otherAlertField, otherChannelWriteAPI, 0);
+    Serial.println("ALERT Field (Field 8) of other channel set to 0.");
     
     Serial.println("============================");
 }
@@ -72,7 +79,6 @@ void loop() {
 void setTrafficLight(String color) 
 {
     String field;
-    int sendVal;
     if (color == "RED") 
     {
         field = fieldRed;
@@ -90,14 +96,14 @@ void setTrafficLight(String color)
     }
     else return;
 
-    Serial.println("Traffic Light: " + color.toUpperCase());
+    Serial.println("Traffic Light: " + color);
     setFieldValue(field, myWriteAPI, sendVal); // Update the appropriate field in ThingSpeak
 }
 
 // Function to set a field value on ThingSpeak
 void setFieldValue(String field, String writeAPI, int value) 
 {
-    String sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
+    sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
     espData("AT+CIPMUX=1", 1000, true);
     espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, true);
     espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, true);
@@ -112,16 +118,19 @@ String espData(String command, const int timeout, boolean debug)
     Serial.print("AT Command ==> ");
     Serial.println(command);
 
-    String response = "";
+    response = "";
     espSerial.println(command);
     long int time = millis();
-    while ((time + timeout) > millis()) {
-        while (espSerial.available()) {
+    while ((time + timeout) > millis()) 
+    {
+        while (espSerial.available()) 
+        {
             char c = espSerial.read();
             response += c;
         }
     }
-    if (debug) {
+    if (debug) 
+    {
         Serial.print(response);
     }
 
