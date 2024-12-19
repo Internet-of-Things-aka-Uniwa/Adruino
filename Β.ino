@@ -31,7 +31,7 @@ void setup()
     Serial.println("************ ESP-01 Setup ************");
     
     Serial.begin(9600);
-    espSerial.begin(9600);                                              // IN CASE OF ERROR, change espSerial to 9600
+    espSerial.begin(9600);                                               // IN CASE OF ERROR, change espSerial to 9600
   
     espData("AT+RST", 1000, DEBUG);                                      // ESP-01 Reset
     espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client

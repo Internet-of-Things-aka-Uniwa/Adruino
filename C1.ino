@@ -34,16 +34,12 @@ unsigned int delayVal = 15000;          // [NEW 5.] Delay value
 String messager;                        // [NEW 6.] Message to be sent
 String x01;                             // [NEW 7.] Value of alert field
 
-int currentMillis;                      // [NEW 8.] Current time     
-int previousMillis = 0;                 // [NEW 9.] Previous time
-const unsigned long timer = 600000      // [NEW 10.] 10 minutes
-
 void setup() 
 {
     Serial.println("************ ESP-01 Setup ************");
     
     Serial.begin(9600);
-    espSerial.begin(9600);                                              // IN CASE OF ERROR, change espSerial to 9600
+    espSerial.begin(9600);                                               // IN CASE OF ERROR, change espSerial to 9600
   
     espData("AT+RST", 1000, DEBUG);                                      // ESP-01 Reset
     espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
