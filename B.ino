@@ -27,11 +27,11 @@ String sendData = "";       // Data to be sent
 int sendVal;                // Value to be sent
 
 void setup() 
-{
-    Serial.println("************ ESP-01 Setup ************");
-    
+{    
     Serial.begin(9600);
     espSerial.begin(9600);                                               // IN CASE OF ERROR, change espSerial to 9600
+
+    Serial.println("************ ESP-01 Setup ************");
   
     espData("AT+RST", 1000, DEBUG);                                      // ESP-01 Reset
     espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
@@ -60,14 +60,17 @@ void loop()
  */
     Serial.println("************ Task A.4 ************");
 
-    setTrafficLight("RED");
+    setTrafficLight("RED"); 
     delay(DELAY_RED);
+    setFieldValue(fieldRed, myWriteAPI, 0); // Turn off RED light
 
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
+    setFieldValue(fieldGreen, myWriteAPI, 0); // Turn off GREEN light
 
     setTrafficLight("ORANGE");
     delay(DELAY_ORANGE);
+    setFieldValue(fieldOrange, myWriteAPI, 0); // Turn off ORANGE light
 
     Serial.println("***************************************");
 
@@ -77,7 +80,7 @@ void loop()
     Serial.println("************ Task B ************");
     
     setFieldValue(fieldAlert, myWriteAPI, 0);
-    Serial.println("ALERT Field (Field 8) of my channel set to 0.");
+    Serial.println("ALERT Field set to 0.");
     
     Serial.println("***************************************");
 }
@@ -103,8 +106,8 @@ void setTrafficLight(String color)
     }
     else return;
 
-    Serial.println("Traffic Light: " + color);
     setFieldValue(field, myWriteAPI, sendVal); // Update the appropriate field in ThingSpeak
+    Serial.println("Traffic Light is set to " + color);
 }
 
 // Function to set a field value on ThingSpeak
