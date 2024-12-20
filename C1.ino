@@ -71,11 +71,11 @@ void loop()
     setTrafficLight("RED");
     delay(DELAY_RED);
 
-    setTrafficLight("ORANGE");
-    delay(DELAY_ORANGE);
-
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
+
+    setTrafficLight("ORANGE");
+    delay(DELAY_ORANGE);
 
     Serial.println("***************************************");
 
