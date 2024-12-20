@@ -36,7 +36,7 @@ String x01;                             // Value of alert field
 
 int currentMillis;                      // [NEW 1.] Current time     
 int previousMillis = 0;                 // [NEW 2.] Previous time
-const unsigned long timer = 600000      // [NEW 3.] 10 minutes
+const unsigned long timer = 600000;     // [NEW 3.] 10 minutes
 
 void setup() 
 {    
