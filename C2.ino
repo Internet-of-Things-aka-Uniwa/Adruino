@@ -92,7 +92,7 @@ void loop()
     Serial.println("************ Task B ************");
     
     setFieldValue(fieldAlert, myWriteAPI, 0);
-    SSerial.println("ALERT Field set to 0.");
+    Serial.println("ALERT Field set to 0.");
     
     Serial.println("***************************************");
 
