@@ -121,6 +121,7 @@ void loop()
     if (currentMillis - previousMillis >= timer)
     { 
         previousMillis = currentMillis;
+        Serial.println("Setting ALERT field value to 1.");
         setFieldValue(fieldAlert, myWriteAPI, 1);
     }
 
