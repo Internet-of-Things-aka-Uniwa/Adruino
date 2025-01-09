@@ -34,7 +34,7 @@ void setup()
     Serial.println("************ ESP-01 Setup ************");
   
     espData("AT+RST", 1000, DEBUG);                                      // Επαναφορά ESP-01
-    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Λειτουργία=1 => client
+    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
     espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Σύνδεση στο δίκτυο WiFi
     
     while(!espSerial.find("WIFI GOT IP"))                                // Αναμονή για σύνδεση
