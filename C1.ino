@@ -1,51 +1,51 @@
-#include <SoftwareSerial.h>       // Serial library
-SoftwareSerial espSerial(6, 7);   // Connect (Arduino RX: pin 6) to (ESP-01: TX pin)
+#include <SoftwareSerial.h>       // Βιβλιοθήκη για σειριακή επικοινωνία
+SoftwareSerial espSerial(6, 7);   // Σύνδεση (Arduino RX: pin 6) με (ESP-01: TX pin)
 
 #define DEBUG true
 
-// WiFi and ThingSpeak Configuration
+// Ρυθμίσεις WiFi και ThingSpeak
 String mySSID = "linksys_1";
 String myPWD = "";
 String myHOST = "api.thingspeak.com";
 String myPORT = "80";
 String myWriteAPI = "6UKE7N1W16R0TIOC";
-String myReadAPI = "MCX66QIC4S1OR75T"; // [NEW 1.] Read API of my channel
+String myReadAPI = "MCX66QIC4S1OR75T"; // [ΝΕΟ 1.] Read API του καναλιού μου
 String myCHANNEL = "2749755";
 
-// Field Names
+// Ονόματα πεδίων
 String fieldRed = "field1";
 String fieldOrange = "field2";
 String fieldGreen = "field3";
 String fieldAlert = "field8";
 
-// Traffic Light Durations
-int DELAY_RED = 30000;      // Delay for RED signal
-int DELAY_ORANGE = 20000;   // Delay for ORANGE signal
-int DELAY_GREEN = 30000;    // Delay for GREEN signal
+// Διάρκειες φωτεινού σηματοδότη
+int DELAY_RED = 30000;      // Καθυστέρηση για το κόκκινο σήμα
+int DELAY_ORANGE = 20000;   // Καθυστέρηση για το πορτοκαλί σήμα
+int DELAY_GREEN = 30000;    // Καθυστέρηση για το πράσινο σήμα
 
-String response;            // Response from ESP8266
-String sendData = "";       // Data to be sent
-int sendVal;                // Value to be sent
+String response;            // Απόκριση από το ESP8266
+String sendData = "";       // Δεδομένα προς αποστολή
+int sendVal;                // Τιμή προς αποστολή
 
-String res_feeds = "";                  // [NEW 2.] Response from ThingSpeak
-int ret_Len;                            // [NEW 3.] Length of response
-int pos;                                // [NEW 4.] Position of field
-unsigned int delayVal = 15000;          // [NEW 5.] Delay value
-String messager;                        // [NEW 6.] Message to be sent
-String x01;                             // [NEW 7.] Value of alert field
+String res_feeds = "";                  // [ΝΕΟ 2.] Απόκριση από το ThingSpeak
+int ret_Len;                            // [ΝΕΟ 3.] Μήκος της απόκρισης
+int pos;                                // [ΝΕΟ 4.] Θέση του πεδίου
+unsigned int delayVal = 15000;          // [ΝΕΟ 5.] Τιμή καθυστέρησης
+String messager;                        // [ΝΕΟ 6.] Μήνυμα προς αποστολή
+String x01;                             // [ΝΕΟ 7.] Τιμή του πεδίου ειδοποίησης (alert)
 
 void setup() 
 {    
     Serial.begin(9600);
-    espSerial.begin(9600);                                               // IN CASE OF ERROR, change espSerial to 9600
+    espSerial.begin(9600);                                               // ΣΕ ΠΕΡΙΠΤΩΣΗ ΣΦΑΛΜΑΤΟΣ, αλλάξτε το espSerial σε 9600
 
-    Serial.println("************ ESP-01 Setup ************");
+    Serial.println("************ Ρύθμιση ESP-01 ************");
   
-    espData("AT+RST", 1000, DEBUG);                                      // ESP-01 Reset
-    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
-    espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Connect to WiFi network
+    espData("AT+RST", 1000, DEBUG);                                      // Επαναφορά ESP-01
+    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Λειτουργία=1 => πελάτης
+    espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Σύνδεση στο δίκτυο WiFi
     
-    while(!espSerial.find("WIFI GOT IP"))                                // Wait for connection
+    while(!espSerial.find("WIFI GOT IP"))                                // Αναμονή για σύνδεση
     {          
         Serial.print(".");
         delay(1000);
@@ -55,7 +55,7 @@ void setup()
         delay(1000);
     }
     
-    Serial.println("Connected!");
+    Serial.println("Συνδέθηκε!");
     delay(1000);
     
     Serial.println("***************************************");
@@ -64,45 +64,45 @@ void setup()
 void loop() 
 {
 /*
- *  Task A.4 : Set the Traffic Light on operation 
+ *  Εργασία A.4: Θέστε τον φωτεινό σηματοδότη σε λειτουργία
  */
-    Serial.println("************ Task A.4 ************");
+    Serial.println("************ Εργασία A.4 ************");
 
     setTrafficLight("RED"); 
     delay(DELAY_RED);
-    setFieldValue(fieldRed, myWriteAPI, 0); // Turn off RED light
+    setFieldValue(fieldRed, myWriteAPI, 0); // Απενεργοποίηση του κόκκινου φωτός
 
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
-    setFieldValue(fieldGreen, myWriteAPI, 0); // Turn off GREEN light
+    setFieldValue(fieldGreen, myWriteAPI, 0); // Απενεργοποίηση του πράσινου φωτός
 
     setTrafficLight("ORANGE");
     delay(DELAY_ORANGE);
-    setFieldValue(fieldOrange, myWriteAPI, 0); // Turn off ORANGE light
+    setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί φωτός
 
     Serial.println("***************************************");
 
 /*
- *  Task B : Set ALERT Field to 0 
+ *  Εργασία B: Θέστε το πεδίο ALERT σε 0
  */
-    Serial.println("************ Task B ************");
+    Serial.println("************ Εργασία B ************");
     
-    setFieldValue(fieldAlert, myWriteAPI, 0);
-    Serial.println("ALERT Field set to 0.");
+    setFieldValue(fieldAlert, myWriteAPI, 0); // Ρύθμιση του πεδίου ALERT σε 0
+    Serial.println("Το πεδίο ALERT ρυθμίστηκε σε 0.");
     
     Serial.println("***************************************");
 
 /*
- *  Task C.1 : Read ALERT Field and set Traffic Light to ORANGE if value is 1
+ *  Εργασία C.1: Διαβάστε το πεδίο ALERT και θέστε τον φωτεινό σηματοδότη σε ΠΟΡΤΟΚΑΛΙ αν η τιμή είναι 1
  */
-    Serial.println("************ Task C.1 ************");
+    Serial.println("************ Εργασία C.1 ************");
         
-    x01 = getFieldValue(fieldAlert);
-    Serial.println("ALERT field value:" + x01);
+    x01 = getFieldValue(fieldAlert); // Ανάγνωση τιμής του πεδίου ALERT
+    Serial.println("Τιμή πεδίου ALERT:" + x01);
 
     if (x01 == 1)
     {
-        Serial.println("ALERT: Traffic Light out of order.");
+        Serial.println("ΕΙΔΟΠΟΙΗΣΗ: Ο φωτεινός σηματοδότης δεν λειτουργεί σωστά.");
         setTrafficLight("ORANGE");
     }
   
@@ -115,7 +115,7 @@ void loop()
     delay(delayVal);
 }
 
-// Function to set the traffic light to a specific color
+// Συνάρτηση για ρύθμιση του φωτεινού σηματοδότη σε συγκεκριμένο χρώμα
 void setTrafficLight(String color) 
 {
     String field;
@@ -136,11 +136,11 @@ void setTrafficLight(String color)
     }
     else return;
 
-    setFieldValue(field, myWriteAPI, sendVal); // Update the appropriate field in ThingSpeak
-    Serial.println("Traffic Light is set to " + color);
+    setFieldValue(field, myWriteAPI, sendVal); // Ενημέρωση του αντίστοιχου πεδίου στο ThingSpeak
+    Serial.println("Ο φωτεινός σηματοδότης ρυθμίστηκε σε " + color);
 }
 
-// Function to set a field value on ThingSpeak
+// Συνάρτηση για ρύθμιση τιμής σε ένα πεδίο στο ThingSpeak
 void setFieldValue(String field, String writeAPI, int value) 
 {
     sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
@@ -149,14 +149,14 @@ void setFieldValue(String field, String writeAPI, int value)
     espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);
     espSerial.find(">");
     espSerial.println(sendData);
-    Serial.println("Value to be sent: ");
+    Serial.println("Τιμή προς αποστολή: ");
     Serial.println(value);
 
     espData("AT+CIPCLOSE=0", 1000, true);
     delay(10000);
 }
 
-// [NEW 11.] Function to get the value of a field in ThingSpeak
+// [ΝΕΟ 11.] Συνάρτηση για ανάγνωση της τιμής ενός πεδίου στο ThingSpeak
 String getFieldValue(String field) 
 {
     messager = "GET /channels/" + myCHANNEL + "/feeds.json?api_key=" + myReadAPI + "&results=1";
@@ -166,7 +166,7 @@ String getFieldValue(String field)
     espData("AT+CIPSEND=0,"+ String(messager.length() + 4), 1000, DEBUG);
     espSerial.find(">"); 
     espSerial.println(messager);
-    Serial.println("Starting to read...");
+    Serial.println("Ξεκινά ανάγνωση...");
     espData("AT+CIPCLOSE=0", 1000, DEBUG);
 
     delay(1000);
@@ -181,11 +181,10 @@ String getFieldValue(String field)
     return res_feeds.substring(pos+9, pos+10);
 }
 
-
-// Function to send AT commands to ESP-01
+// Συνάρτηση για αποστολή εντολών AT στο ESP-01
 String espData(String command, const int timeout, boolean debug) 
 {
-    Serial.print("AT Command ==> ");
+    Serial.print("Εντολή AT ==> ");
     Serial.println(command);
 
     response = "";

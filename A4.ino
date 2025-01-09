@@ -1,9 +1,9 @@
-#include <SoftwareSerial.h>       // Serial library
-SoftwareSerial espSerial(6, 7);   // Connect (Arduino RX: pin 6) to (ESP-01: TX pin)
+#include <SoftwareSerial.h>       // Βιβλιοθήκη για σειριακή επικοινωνία
+SoftwareSerial espSerial(6, 7);   // Σύνδεση (Arduino RX: pin 6) με (ESP-01: TX pin)
 
 #define DEBUG true
 
-// WiFi and ThingSpeak Configuration
+// Ρυθμίσεις WiFi και ThingSpeak
 String mySSID = "linksys_1";
 String myPWD = "";
 String myHOST = "api.thingspeak.com";
@@ -11,32 +11,32 @@ String myPORT = "80";
 String myWriteAPI = "6UKE7N1W16R0TIOC";
 String myCHANNEL = "2749755";
 
-// Field Names
+// Ονόματα πεδίων
 String fieldRed = "field1";
 String fieldOrange = "field2";
 String fieldGreen = "field3";
 
-// Traffic Light Durations
-int DELAY_RED = 30000;      // Delay for RED signal
-int DELAY_ORANGE = 20000;   // Delay for ORANGE signal
-int DELAY_GREEN = 30000;    // Delay for GREEN signal
+// Διάρκειες φωτεινού σηματοδότη
+int DELAY_RED = 30000;      // Καθυστέρηση για το κόκκινο σήμα
+int DELAY_ORANGE = 20000;   // Καθυστέρηση για το πορτοκαλί σήμα
+int DELAY_GREEN = 30000;    // Καθυστέρηση για το πράσινο σήμα
 
-String response;            // Response from ESP8266
-String sendData = "";       // Data to be sent
-int sendVal;                // Value to be sent
+String response;            // Απόκριση από το ESP8266
+String sendData = "";       // Δεδομένα προς αποστολή
+int sendVal;                // Τιμή προς αποστολή
 
 void setup() 
 {    
     Serial.begin(9600);
-    espSerial.begin(9600);                                               // IN CASE OF ERROR, change espSerial to 9600
+    espSerial.begin(9600);                                               // ΣΕ ΠΕΡΙΠΤΩΣΗ ΣΦΑΛΜΑΤΟΣ, αλλάξτε το espSerial σε 9600
 
     Serial.println("************ ESP-01 Setup ************");
   
-    espData("AT+RST", 1000, DEBUG);                                      // ESP-01 Reset
-    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
-    espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Connect to WiFi network
+    espData("AT+RST", 1000, DEBUG);                                      // Επαναφορά ESP-01
+    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Λειτουργία=1 => client
+    espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Σύνδεση στο δίκτυο WiFi
     
-    while(!espSerial.find("WIFI GOT IP"))                                // Wait for connection
+    while(!espSerial.find("WIFI GOT IP"))                                // Αναμονή για σύνδεση
     {          
         Serial.print(".");
         delay(1000);
@@ -55,26 +55,26 @@ void setup()
 void loop() 
 {
 /*
- *  Task A.4 : Set the Traffic Light on operation 
+ *  Task A.4 : Ενεργοποίηση φωτεινού σηματοδότη 
  */
     Serial.println("************ Task A.4 ************");
 
     setTrafficLight("RED"); 
     delay(DELAY_RED);
-    setFieldValue(fieldRed, myWriteAPI, 0); // Turn off RED light
+    setFieldValue(fieldRed, myWriteAPI, 0); // Απενεργοποίηση του κόκκινου φωτός
 
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
-    setFieldValue(fieldGreen, myWriteAPI, 0); // Turn off GREEN light
+    setFieldValue(fieldGreen, myWriteAPI, 0); // Απενεργοποίηση του πράσινου φωτός
 
     setTrafficLight("ORANGE");
     delay(DELAY_ORANGE);
-    setFieldValue(fieldOrange, myWriteAPI, 0); // Turn off ORANGE light
+    setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί φωτός
 
     Serial.println("***************************************");
 }
 
-// Function to set the traffic light to a specific color
+// Συνάρτηση για ρύθμιση του φωτεινού σηματοδότη σε συγκεκριμένο χρώμα
 void setTrafficLight(String color) 
 {
     String field;
@@ -95,11 +95,11 @@ void setTrafficLight(String color)
     }
     else return;
 
-    setFieldValue(field, myWriteAPI, sendVal); // Update the appropriate field in ThingSpeak
+    setFieldValue(field, myWriteAPI, sendVal); // Ενημέρωση του αντίστοιχου πεδίου στο ThingSpeak
     Serial.println("Traffic Light is set to " + color);
 }
 
-// Function to set a field value on ThingSpeak
+// Συνάρτηση για ρύθμιση τιμής σε ένα πεδίο στο ThingSpeak
 void setFieldValue(String field, String writeAPI, int value) 
 {
     sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
@@ -115,7 +115,7 @@ void setFieldValue(String field, String writeAPI, int value)
     delay(10000);
 }
 
-// Function to send AT commands to ESP-01
+// Συνάρτηση για αποστολή εντολών AT στο ESP-01
 String espData(String command, const int timeout, boolean debug) 
 {
     Serial.print("AT Command ==> ");
