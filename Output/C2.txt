@@ -36,4 +36,7 @@ ALERT: Traffic Light out of order, setting the ORANGE signal.
 
 ************ Task C.2 ************
 Setting the ALERT field to 1.
+ALERT: Traffic Light out of order, setting the ORANGE signal.
+Value to be sent: 
+2
 ***************************************
