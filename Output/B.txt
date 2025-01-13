@@ -1,0 +1,29 @@
+************ ESP-01 Setup ************
+AT Command ==> AT+RST
+.
+.
+.
+AT Command ==> AT+CWMODE=1
+AT Command ==> AT+CWJAP="linksys_1",""
+Connected!
+***************************************
+
+************ Task A.4 ************
+Traffic Light is set to RED
+Value to be sent: 
+1
+Traffic Light is set to GREEN
+Value to be sent: 
+3
+Traffic Light is set to ORANGE
+Value to be sent: 
+2
+***************************************
+************ Task B ************
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,XX  // (XX is the length of the HTTP request)
+Value to be sent: 
+0
+ALERT Field set to 0.
+***************************************

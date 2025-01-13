@@ -1,0 +1,33 @@
+************ ESP-01 Setup ************
+AT Command ==> AT+RST
+AT Command ==> AT+CWMODE=1
+AT Command ==> AT+CWJAP="linksys_1",""
+...Connecting to WiFi...
+Connected!
+***************************************
+
+************ Task A.4 ************
+Traffic Light is set to RED
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,52
+Value to be sent: 
+1
+AT Command ==> AT+CIPCLOSE=0
+
+Traffic Light is set to GREEN
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,52
+Value to be sent: 
+3
+AT Command ==> AT+CIPCLOSE=0
+
+Traffic Light is set to ORANGE
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,52
+Value to be sent: 
+2
+AT Command ==> AT+CIPCLOSE=0
+***************************************

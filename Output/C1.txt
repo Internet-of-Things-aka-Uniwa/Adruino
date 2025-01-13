@@ -1,0 +1,60 @@
+************ ESP-01 Setup ************
+AT Command ==> AT+RST
+AT Command ==> AT+CWMODE=1
+AT Command ==> AT+CWJAP="linksys_1",""
+
+... // Waiting for Wi-Fi connection
+... // Waiting for Wi-Fi connection
+... // Waiting for Wi-Fi connection
+
+Connected!
+***************************************
+
+************ Task A.4 ************
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,<length_of_data>
+Value to be sent:
+1
+Traffic Light is set to RED
+
+AT Command ==> AT+CIPCLOSE=0
+
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,<length_of_data>
+Value to be sent:
+3
+Traffic Light is set to GREEN
+
+AT Command ==> AT+CIPCLOSE=0
+
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,<length_of_data>
+Value to be sent:
+2
+Traffic Light is set to ORANGE
+
+AT Command ==> AT+CIPCLOSE=0
+***************************************
+
+************ Task B ************
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSEND=0,<length_of_data>
+Value to be sent:
+0
+ALERT Field set to 0.
+***************************************
+
+************ Task C.1 ************
+AT Command ==> AT+CIPMUX=1
+AT Command ==> AT+CIPSTART=0,"TCP","api.thingspeak.com",80
+AT Command ==> AT+CIPSTO=10
+AT Command ==> AT+CIPSEND=0,<length_of_data>
+Starting to read...
+<Value of response JSON received from ThingSpeak>
+
+Value of ALERT field: 0
+***************************************

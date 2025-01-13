@@ -29,15 +29,15 @@ int sendVal;                // Τιμή προς αποστολή
 void setup() 
 {    
     Serial.begin(9600);
-    espSerial.begin(9600);                                               // ΣΕ ΠΕΡΙΠΤΩΣΗ ΣΦΑΛΜΑΤΟΣ, αλλάξτε το espSerial σε 9600
+    espSerial.begin(9600);                                                // ΣΕ ΠΕΡΙΠΤΩΣΗ ΣΦΑΛΜΑΤΟΣ, αλλάξτε το espSerial σε 9600
 
     Serial.println("************ ESP-01 Setup ************");
-  
-    espData("AT+RST", 1000, DEBUG);                                      // Επαναφορά ESP-01
-    espData("AT+CWMODE=1", 1000, DEBUG);                                 // Mode=1 => client
-    espData("AT+CWJAP=\""+ mySSID +"\",\""+ myPWD +"\"", 1000, DEBUG);   // Σύνδεση στο δίκτυο WiFi
+   
+    espData("AT+RST", 1000, DEBUG);                                        // Επαναφορά ESP-01
+    espData("AT+CWMODE=1", 1000, DEBUG);                                   // Mode=1 => client
+    espData("AT+CWJAP=\"" + mySSID + "\",\"" + myPWD + "\"", 1000, DEBUG); // Σύνδεση στο δίκτυο WiFi
     
-    while(!espSerial.find("WIFI GOT IP"))                                // Αναμονή για σύνδεση
+    while(!espSerial.find("WIFI GOT IP"))                                  // Αναμονή για σύνδεση
     {          
         Serial.print(".");
         delay(1000);
@@ -56,26 +56,26 @@ void setup()
 void loop() 
 {
 /*
- *  Task A.4 : Θέστε τον φωτεινό σηματοδότη σε λειτουργία
+ *  Task Α.4 : Ενεργοποίηση φωτεινού σηματοδότη 
  */
     Serial.println("************ Task A.4 ************");
 
     setTrafficLight("RED"); 
     delay(DELAY_RED);
-    setFieldValue(fieldRed, myWriteAPI, 0); // Απενεργοποίηση του κόκκινου φωτός
+    setFieldValue(fieldRed, myWriteAPI, 0); // Απενεργοποίηση του κόκκινου σήματος
 
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
-    setFieldValue(fieldGreen, myWriteAPI, 0); // Απενεργοποίηση του πράσινου φωτός
+    setFieldValue(fieldGreen, myWriteAPI, 0); // Απενεργοποίηση του πράσινου σήματο
 
     setTrafficLight("ORANGE");
     delay(DELAY_ORANGE);
-    setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί φωτός
+    setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί σήματος
 
     Serial.println("***************************************");
 
 /*
- *  Task B : Θέστε το πεδίο ALERT (Πεδίο 8) του καναλιού μου σε 0 
+ *  Task Β : Αποστολή της τιμής 0 στο κανάλι field8 που ελέγχει την λειτουργία του σηματοδότη
  */
     Serial.println("************ Task B ************");
     
@@ -107,14 +107,17 @@ void setTrafficLight(String color)
     else return;
 
     setFieldValue(field, myWriteAPI, sendVal); // Ενημέρωση του αντίστοιχου πεδίου στο ThingSpeak
-    Serial.println("Traffic Light is set to " + color);
+    Serial.println("Traffic Light is set to " +color);
 }
 
-// Συνάρτηση για ρύθμιση τιμής σε ένα πεδίο στο ThingSpeak
+// Συνάρτηση για εγγραφή τιμής σε ένα πεδίο στο ThingSpeak
 void setFieldValue(String field, String writeAPI, int value) 
 {
+	// HTTP GET request για εγγραφή τιμής σε κάποιο πεδίο
     sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
-    espData("AT+CIPMUX=1", 1000, DEBUG);
+    
+	// Έναρξη TCP σύνδεσης
+	espData("AT+CIPMUX=1", 1000, DEBUG);
     espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
     espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);
     espSerial.find(">");
@@ -122,6 +125,7 @@ void setFieldValue(String field, String writeAPI, int value)
     Serial.println("Value to be sent: ");
     Serial.println(value);
 
+	// Τερματισμός TCP σύνδεσης
     espData("AT+CIPCLOSE=0", 1000, true);
     delay(10000);
 }
