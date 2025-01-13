@@ -15,7 +15,6 @@ String myCHANNEL = "2749755";
 String fieldRed = "field1";
 String fieldOrange = "field2";
 String fieldGreen = "field3";
-String fieldAlert = "field8"; // [ΝΕΟ 1.] Προσθήκη πεδίου ειδοποίησης
 
 // Διάρκειες φωτεινού σηματοδότη
 int DELAY_RED = 30000;      // Καθυστέρηση για το κόκκινο σήμα
@@ -56,32 +55,22 @@ void setup()
 void loop() 
 {
 /*
- *  Task A.4 : Θέστε τον φωτεινό σηματοδότη σε λειτουργία
+ *  Task A.4 : Ενεργοποίηση φωτεινού σηματοδότη 
  */
     Serial.println("************ Task A.4 ************");
 
     setTrafficLight("RED"); 
     delay(DELAY_RED);
-    setFieldValue(fieldRed, myWriteAPI, 0); // Απενεργοποίηση του κόκκινου φωτός
+    setFieldValue(fieldRed, myWriteAPI, 0); // Απενεργοποίηση του κόκκινου σήματος
 
     setTrafficLight("GREEN");
     delay(DELAY_GREEN);
-    setFieldValue(fieldGreen, myWriteAPI, 0); // Απενεργοποίηση του πράσινου φωτός
+    setFieldValue(fieldGreen, myWriteAPI, 0); // Απενεργοποίηση του πράσινου σήματο
 
     setTrafficLight("ORANGE");
     delay(DELAY_ORANGE);
-    setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί φωτός
+    setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί σήματος
 
-    Serial.println("***************************************");
-
-/*
- *  Task B : Θέστε το πεδίο ALERT (Πεδίο 8) του καναλιού μου σε 0 
- */
-    Serial.println("************ Task B ************");
-    
-    setFieldValue(fieldAlert, myWriteAPI, 0);
-    Serial.println("ALERT Field set to 0.");
-    
     Serial.println("***************************************");
 }
 
@@ -110,10 +99,11 @@ void setTrafficLight(String color)
     Serial.println("Traffic Light is set to " + color);
 }
 
-// Συνάρτηση για ρύθμιση τιμής σε ένα πεδίο στο ThingSpeak
+// Συνάρτηση για εγγραφή τιμής σε ένα πεδίο στο ThingSpeak
 void setFieldValue(String field, String writeAPI, int value) 
 {
     sendData = "GET /update?api_key=" + writeAPI + "&" + field + "=" + String(value);
+    
     espData("AT+CIPMUX=1", 1000, DEBUG);
     espData("AT+CIPSTART=0,\"TCP\",\"" + myHOST + "\"," + myPORT, 1000, DEBUG);
     espData("AT+CIPSEND=0," + String(sendData.length() + 4), 1000, DEBUG);

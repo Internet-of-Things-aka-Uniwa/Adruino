@@ -15,6 +15,7 @@ String myCHANNEL = "2749755";
 String fieldRed = "field1";
 String fieldOrange = "field2";
 String fieldGreen = "field3";
+String fieldAlert = "field8"; // [ΝΕΟ 1.] Προσθήκη πεδίου ειδοποίησης για την λειτουργία του φαναριού
 
 // Διάρκειες φωτεινού σηματοδότη
 int DELAY_RED = 30000;      // Καθυστέρηση για το κόκκινο σήμα
@@ -55,7 +56,7 @@ void setup()
 void loop() 
 {
 /*
- *  Task A.4 : Ενεργοποίηση φωτεινού σηματοδότη 
+ *  Task A.4 : Θέστε τον φωτεινό σηματοδότη σε λειτουργία
  */
     Serial.println("************ Task A.4 ************");
 
@@ -71,6 +72,16 @@ void loop()
     delay(DELAY_ORANGE);
     setFieldValue(fieldOrange, myWriteAPI, 0); // Απενεργοποίηση του πορτοκαλί φωτός
 
+    Serial.println("***************************************");
+
+/*
+ *  Task B : Θέστε το πεδίο ALERT (Πεδίο 8) του καναλιού μου σε 0 
+ */
+    Serial.println("************ Task B ************");
+    
+    setFieldValue(fieldAlert, myWriteAPI, 0);
+    Serial.println("ALERT Field set to 0.");
+    
     Serial.println("***************************************");
 }
 

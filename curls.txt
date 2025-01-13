@@ -1,0 +1,20 @@
+// Ανάβει ΚΟΚΚΙΝΟ
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field1=1"
+// Σβήνει ΚΟΚΚΙΝΟ
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field1=0"
+
+// Ανάβει ΠΟΡΤΟΚΑΛΙ
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field2=2"
+// Σβήνει ΠΟΡΤΟΚΑΛΙ
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field2=0"
+
+// Ανάβει ΠΡΑΣΙΝΟ
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field3=3"
+// Σβήνει ΠΡΑΣΙΝΟ
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field3=0"
+
+// Τιμή ΕΓΚΥΡΗΣ λειτουργίας για το φανάρι από το ALERT field
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field8=0"
+// Τιμή ΑΚΥΡΗΣ λειτουργίας για το φανάρι από το ALERT field
+curl "https://api.thingspeak.com/update/?api_key=6UKE7N1W16R0TIOC&field8=1"
+
